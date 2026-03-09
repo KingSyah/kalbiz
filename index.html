@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Untung Rugi</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3248;
+    --accent-green: #00e676;
+    --accent-red: #ff4d6d;
+    --accent-blue: #4d8bff;
+    --accent-yellow: #ffd60a;
+    --text: #e8eaf0;
+    --text-muted: #7b82a0;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px 16px 60px;
+  }
+
+  /* Background decoration */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px; left: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(77,139,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -200px; right: -200px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,230,118,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 520px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding-top: 12px;
+  }
+  .header .badge {
+    display: inline-block;
+    background: rgba(77,139,255,0.15);
+    border: 1px solid rgba(77,139,255,0.3);
+    color: var(--accent-blue);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 50px;
+    margin-bottom: 14px;
+  }
+  .header h1 {
+    font-family: 'Sora', sans-serif;
+    font-size: clamp(24px, 6vw, 32px);
+    font-weight: 700;
+    background: linear-gradient(135deg, #e8eaf0 0%, #7b82a0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+  .header p {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    box-shadow: 0 0 8px var(--accent-blue);
+  }
+
+  /* Input group */
+  .input-group {
+    margin-bottom: 14px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .prefix {
+    position: absolute;
+    left: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  .suffix {
+    position: absolute;
+    right: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+  input[type="number"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px 12px 48px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input[type="number"]:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(77,139,255,0.12);
+  }
+  input.has-suffix { padding-right: 42px; }
+
+  /* Biaya ops list */
+  .ops-list { display: flex; flex-direction: column; gap: 10px; }
+  .ops-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ops-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    width: 110px;
+    flex-shrink: 0;
+  }
+  .ops-item input {
+    flex: 1;
+    padding-left: 48px;
+  }
+  .add-btn {
+    width: 100%;
+    background: transparent;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .add-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    background: rgba(77,139,255,0.05);
+  }
+  .remove-btn {
+    background: rgba(255,77,109,0.12);
+    border: none;
+    color: var(--accent-red);
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .remove-btn:hover { background: rgba(255,77,109,0.25); }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 18px 0;
+  }
+
+  /* Calculate button */
+  .calc-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #4d8bff 0%, #00b4d8 100%);
+    border: none;
+    border-radius: var(--radius);
+    padding: 16px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: white;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(77,139,255,0.3);
+    margin-bottom: 20px;
+  }
+  .calc-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(77,139,255,0.45);
+  }
+  .calc-btn:active { transform: translateY(0); }
+
+  /* Result card */
+  .result-card {
+    display: none;
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .result-card.profit {
+    background: linear-gradient(135deg, rgba(0,230,118,0.12) 0%, rgba(0,182,93,0.05) 100%);
+    border: 1.5px solid rgba(0,230,118,0.3);
+  }
+  .result-card.loss {
+    background: linear-gradient(135deg, rgba(255,77,109,0.12) 0%, rgba(200,0,50,0.05) 100%);
+    border: 1.5px solid rgba(255,77,109,0.3);
+  }
+  .result-card.break-even {
+    background: linear-gradient(135deg, rgba(255,214,10,0.1) 0%, rgba(200,170,0,0.05) 100%);
+    border: 1.5px solid rgba(255,214,10,0.3);
+  }
+  .result-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .status-icon {
+    font-size: 36px;
+    line-height: 1;
+  }
+  .status-label {
+    font-family: 'Sora', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .profit .status-label { color: var(--accent-green); }
+  .loss .status-label { color: var(--accent-red); }
+  .break-even .status-label { color: var(--accent-yellow); }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .result-item {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+  }
+  .result-item-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .result-item-value {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .result-item-value.green { color: var(--accent-green); }
+  .result-item-value.red { color: var(--accent-red); }
+  .result-item-value.yellow { color: var(--accent-yellow); }
+  .result-item-value.blue { color: var(--accent-blue); }
+
+  /* BEP row full width */
+  .bep-row {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .bep-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  .bep-value {
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent-yellow);
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    background: rgba(255,255,255,0.07);
+    border-radius: 50px;
+    height: 8px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .progress-bar {
+    height: 100%;
+    border-radius: 50px;
+    transition: width 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
+  }
+  .profit .progress-bar { background: linear-gradient(90deg, var(--accent-green), #00c853); }
+  .loss .progress-bar { background: linear-gradient(90deg, var(--accent-red), #c62828); }
+  .break-even .progress-bar { background: linear-gradient(90deg, var(--accent-yellow), #ff8f00); }
+
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  /* Reset link */
+  .reset-btn {
+    display: block;
+    text-align: center;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .reset-btn:hover { border-color: var(--text-muted); color: var(--text); }
+
+  /* Summary info */
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-row span:first-child { color: var(--text-muted); }
+  .info-row span:last-child { font-weight: 700; font-family: 'Sora', sans-serif; }
+
+  /* Tooltip / hint */
+  .hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    padding-left: 2px;
+  }
+
+  /* Section glow line */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(77,139,255,0.4), transparent);
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  @media (max-width: 400px) {
+    .result-grid { grid-template-columns: 1fr; }
+    .ops-label { width: 90px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="badge">🧮 Kalkulator Bisnis</div>
+    <h1>Untung &amp; Rugi<br>Penjualan</h1>
+    <p>Hitung BEP, margin, dan hasil penjualan harianmu</p>
+  </div>
+
+  <!-- Harga Produk -->
+  <div class="card">
+    <div class="card-title"><span class="dot"></span> Harga Produk</div>
+    <div class="input-group">
+      <label>HPP (Harga Pokok Produksi) / pcs</label>
+      <div class="input-wrapper">
+        <span class="prefix">Rp</span>
+        <input type="number" id="hpp" placeholder="2700" min="0">
+      </div>
+      <div class="hint">Biaya produksi per satu unit produk</div>
+    </div>
+    <div class="input-group">
+      <label>Harga Jual / pcs</label>
+      <div class="input-wrapper">
+        <span class="prefix">Rp</span>
+        <input type="number" id="hargaJual" placeholder="5000" min="0">
+      </div>
+    </div>
+  </div>
+
+  <!-- Biaya Operasional -->
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--accent-yellow);box-shadow:0 0 8px var(--accent-yellow)"></span> Biaya Operasional Per Bulan</div>
+    <div class="ops-list" id="opsList">
+      <div class="ops-item" data-index="0">
+        <div class="ops-label">Listrik &amp; Air</div>
+        <div class="input-wrapper" style="flex:1">
+          <span class="prefix">Rp</span>
+          <input type="number" class="ops-input" placeholder="100000" min="0">
+        </div>
+        <button class="remove-btn" onclick="removeOps(this)" title="Hapus">×</button>
+      </div>
+      <div class="ops-item" data-index="1">
+        <div class="ops-label">Internet</div>
+        <div class="input-wrapper" style="flex:1">
+          <span class="prefix">Rp</span>
+          <input type="number" class="ops-input" placeholder="100000" min="0">
+        </div>
+        <button class="remove-btn" onclick="removeOps(this)" title="Hapus">×</button>
+      </div>
+      <div class="ops-item" data-index="2">
+        <div class="ops-label">Sewa Tempat</div>
+        <div class="input-wrapper" style="flex:1">
+          <span class="prefix">Rp</span>
+          <input type="number" class="ops-input" placeholder="500000" min="0">
+        </div>
+        <button class="remove-btn" onclick="removeOps(this)" title="Hapus">×</button>
+      </div>
+      <div class="ops-item" data-index="3">
+        <div class="ops-label">Staff/Gaji</div>
+        <div class="input-wrapper" style="flex:1">
+          <span class="prefix">Rp</span>
+          <input type="number" class="ops-input" placeholder="2000000" min="0">
+        </div>
+        <button class="remove-btn" onclick="removeOps(this)" title="Hapus">×</button>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addOps()">＋ Tambah Biaya</button>
+  </div>
+
+  <!-- Penjualan Aktual -->
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:var(--accent-green);box-shadow:0 0 8px var(--accent-green)"></span> Penjualan Aktual</div>
+    <div class="input-group">
+      <label>Jumlah Terjual Per Hari (pcs)</label>
+      <div class="input-wrapper">
+        <span class="prefix" style="left:10px">📦</span>
+        <input type="number" id="terjualHarian" placeholder="50" min="0" style="padding-left:38px">
+        <span class="suffix">pcs/hari</span>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>Jumlah Hari Operasional Per Bulan</label>
+      <div class="input-wrapper">
+        <span class="prefix" style="left:10px">📅</span>
+        <input type="number" id="hariOps" placeholder="26" min="1" max="31" style="padding-left:38px">
+        <span class="suffix">hari</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hitung Button -->
+  <button class="calc-btn" onclick="hitung()">⚡ Hitung Sekarang</button>
+
+  <!-- Result -->
+  <div class="result-card" id="resultCard">
+    <div class="result-status">
+      <span class="status-icon" id="statusIcon"></span>
+      <span class="status-label" id="statusLabel"></span>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-item">
+        <div class="result-item-label">Margin / pcs</div>
+        <div class="result-item-value blue" id="rMargin">-</div>
+      </div>
+      <div class="result-item">
+        <div class="result-item-label">Margin %</div>
+        <div class="result-item-value blue" id="rMarginPct">-</div>
+      </div>
+      <div class="result-item">
+        <div class="result-item-label">Total Biaya Ops</div>
+        <div class="result-item-value" id="rBiayaOps">-</div>
+      </div>
+      <div class="result-item">
+        <div class="result-item-label">Omzet Bulan Ini</div>
+        <div class="result-item-value" id="rOmzet">-</div>
+      </div>
+    </div>
+
+    <div class="bep-row">
+      <div>
+        <div class="bep-label">BEP (Break Even Point)</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Min. penjualan agar tidak rugi</div>
+      </div>
+      <div class="bep-value" id="rBEP">-</div>
+    </div>
+
+    <hr class="divider" style="margin:14px 0">
+
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;margin-bottom:10px;">Ringkasan Bulan Ini</div>
+    <div class="info-row"><span>Total Terjual</span><span id="rTotalTerjual">-</span></div>
+    <div class="info-row"><span>Total HPP</span><span id="rTotalHPP">-</span></div>
+    <div class="info-row"><span>Total Omzet</span><span id="rTotalOmzet">-</span></div>
+    <div class="info-row"><span>Laba Kotor</span><span id="rLabaKotor">-</span></div>
+    <div class="info-row"><span>Biaya Ops Bulanan</span><span id="rBiayaOps2">-</span></div>
+    <div class="info-row" style="padding-top:10px;margin-top:4px;border-top:2px solid var(--border);border-bottom:none">
+      <span style="font-weight:700;color:var(--text)">Laba / Rugi Bersih</span>
+      <span id="rLabaBersih" style="font-size:16px">-</span>
+    </div>
+
+    <hr class="divider">
+
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px;">Pencapaian vs BEP</div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+    <div class="progress-labels">
+      <span>0</span>
+      <span id="progressText">-</span>
+      <span id="progressMax">-</span>
+    </div>
+  </div>
+
+  <!-- Reset -->
+  <button class="reset-btn" onclick="reset()">↺ Reset Semua</button>
+
+</div>
+
+<script>
+let opsCounter = 4;
+
+function addOps() {
+  const list = document.getElementById('opsList');
+  const item = document.createElement('div');
+  item.className = 'ops-item';
+  item.dataset.index = opsCounter++;
+  item.innerHTML = `
+    <div class="ops-label" contenteditable="true" style="outline:none;border-bottom:1px solid var(--border);cursor:text;" title="Klik untuk edit nama">Biaya Lain</div>
+    <div class="input-wrapper" style="flex:1">
+      <span class="prefix">Rp</span>
+      <input type="number" class="ops-input" placeholder="0" min="0">
+    </div>
+    <button class="remove-btn" onclick="removeOps(this)" title="Hapus">×</button>
+  `;
+  list.appendChild(item);
+  item.querySelector('input').focus();
+}
+
+function removeOps(btn) {
+  const items = document.querySelectorAll('.ops-item');
+  if (items.length <= 1) return;
+  btn.closest('.ops-item').remove();
+}
+
+function fmt(n) {
+  return 'Rp ' + Math.abs(Math.round(n)).toLocaleString('id-ID');
+}
+
+function hitung() {
+  const hpp = parseFloat(document.getElementById('hpp').value) || 0;
+  const hargaJual = parseFloat(document.getElementById('hargaJual').value) || 0;
+  const terjualHarian = parseFloat(document.getElementById('terjualHarian').value) || 0;
+  const hariOps = parseFloat(document.getElementById('hariOps').value) || 26;
+
+  if (!hpp || !hargaJual || !terjualHarian) {
+    alert('Mohon isi HPP, Harga Jual, dan Jumlah Terjual terlebih dahulu!');
+    return;
+  }
+  if (hargaJual < hpp) {
+    alert('⚠️ Harga Jual lebih kecil dari HPP! Kamu pasti rugi.');
+  }
+
+  // Biaya ops
+  let totalOps = 0;
+  document.querySelectorAll('.ops-input').forEach(input => {
+    totalOps += parseFloat(input.value) || 0;
+  });
+
+  const margin = hargaJual - hpp;
+  const marginPct = hpp > 0 ? (margin / hpp * 100) : 0;
+  const bepBulanan = totalOps > 0 && margin > 0 ? Math.ceil(totalOps / margin) : 0;
+  const bepHarian = hariOps > 0 ? Math.ceil(bepBulanan / hariOps) : 0;
+
+  const totalTerjual = terjualHarian * hariOps;
+  const omzetBulanan = totalTerjual * hargaJual;
+  const totalHPP = totalTerjual * hpp;
+  const labaKotor = totalTerjual * margin;
+  const labaBersih = labaKotor - totalOps;
+
+  // Show result
+  const card = document.getElementById('resultCard');
+  card.style.display = 'block';
+
+  let statusClass, icon, label;
+  if (labaBersih > 0) {
+    statusClass = 'profit';
+    icon = '🎉';
+    label = 'UNTUNG!';
+  } else if (labaBersih < 0) {
+    statusClass = 'loss';
+    icon = '😟';
+    label = 'RUGI';
+  } else {
+    statusClass = 'break-even';
+    icon = '😐';
+    label = 'IMPAS';
+  }
+
+  card.className = 'result-card ' + statusClass;
+  document.getElementById('statusIcon').textContent = icon;
+  document.getElementById('statusLabel').textContent = label;
+
+  document.getElementById('rMargin').textContent = fmt(margin);
+  document.getElementById('rMarginPct').textContent = marginPct.toFixed(1) + '%';
+  document.getElementById('rBiayaOps').textContent = fmt(totalOps);
+  document.getElementById('rOmzet').textContent = fmt(omzetBulanan);
+  document.getElementById('rBEP').textContent = bepHarian + ' pcs/hari';
+
+  document.getElementById('rTotalTerjual').textContent = totalTerjual.toLocaleString('id-ID') + ' pcs';
+  document.getElementById('rTotalHPP').textContent = fmt(totalHPP);
+  document.getElementById('rTotalOmzet').textContent = fmt(omzetBulanan);
+  document.getElementById('rLabaKotor').textContent = fmt(labaKotor);
+  document.getElementById('rBiayaOps2').textContent = fmt(totalOps);
+
+  const elLabaBersih = document.getElementById('rLabaBersih');
+  elLabaBersih.textContent = (labaBersih >= 0 ? '' : '-') + fmt(labaBersih);
+  elLabaBersih.style.color = labaBersih > 0 ? 'var(--accent-green)' : labaBersih < 0 ? 'var(--accent-red)' : 'var(--accent-yellow)';
+
+  // Progress bar
+  const maxPcs = Math.max(bepBulanan * 1.5, totalTerjual * 1.2, 1);
+  const pct = Math.min((totalTerjual / maxPcs) * 100, 100);
+  const bepPct = Math.min((bepBulanan / maxPcs) * 100, 100);
+  setTimeout(() => {
+    document.getElementById('progressBar').style.width = pct + '%';
+  }, 100);
+  document.getElementById('progressText').textContent = totalTerjual + ' pcs (kamu)';
+  document.getElementById('progressMax').textContent = Math.round(maxPcs) + ' pcs';
+
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function reset() {
+  document.getElementById('hpp').value = '';
+  document.getElementById('hargaJual').value = '';
+  document.getElementById('terjualHarian').value = '';
+  document.getElementById('hariOps').value = '';
+  document.querySelectorAll('.ops-input').forEach(i => i.value = '');
+  document.getElementById('resultCard').style.display = 'none';
+  document.getElementById('progressBar').style.width = '0%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
