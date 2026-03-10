@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Untung Rugi Bisnis</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ══════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════ -->
+  <div class="header">
+    <div class="badge">🧮 Kalkulator Bisnis</div>
+    <h1>Untung &amp; Rugi<br>Penjualan</h1>
+    <p>Isi 3 langkah di bawah, pilih periode, lalu klik Hitung.<br>Semua istilah ada penjelasannya — cocok untuk pemula!</p>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       LANGKAH 1 — HARGA PRODUK
+  ══════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">
+          <span class="dot" style="background:var(--blue);box-shadow:0 0 8px var(--blue)"></span>
+          Langkah 1 — Harga Produk
+        </div>
+        <div class="card-subtitle">Berapa modal dan harga jual tiap produkmu?</div>
+      </div>
+      <span class="help-tag" onclick="toggleTip('t1')">❓ Penjelasan</span>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tip-box" id="t1">
+      <p>
+        <strong>HPP (Harga Pokok Produksi/Pembelian)</strong> = total biaya untuk membuat atau membeli
+        <em>satu</em> unit produk. Termasuk bahan baku, kemasan, dan ongkos produksi.
+      </p>
+      <p><strong>Harga Jual</strong> = harga yang kamu tawarkan ke pelanggan per satu produk.</p>
+      <div class="ex">
+        📌 <strong>Contoh nyata:</strong><br>
+        Kamu bikin keripik singkong. Bahan Rp 1.800 + kemasan Rp 500 + gas+listrik Rp 400 = HPP Rp 2.700.<br>
+        Kamu jual ke pelanggan Rp 5.000 per bungkus.<br>
+        Maka <strong>margin = Rp 5.000 − Rp 2.700 = Rp 2.300</strong> per bungkus.
+      </div>
+    </div>
+
+    <!-- Input HPP -->
+    <div class="ig">
+      <label>HPP — Modal per produk <span class="lb">WAJIB</span></label>
+      <div class="iw">
+        <span class="ipfx">Rp</span>
+        <input type="number" id="hpp" placeholder="2.700" min="0" oninput="prvMargin()">
+      </div>
+      <div class="preview" id="pvHPP">Isi kedua harga untuk melihat margin</div>
+    </div>
+
+    <!-- Input Harga Jual -->
+    <div class="ig">
+      <label>Harga Jual ke Pelanggan <span class="lb">WAJIB</span></label>
+      <div class="iw">
+        <span class="ipfx">Rp</span>
+        <input type="number" id="hj" placeholder="5.000" min="0" oninput="prvMargin()">
+      </div>
+      <div class="preview" id="pvMargin">—</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       LANGKAH 2 — BIAYA OPERASIONAL
+  ══════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">
+          <span class="dot" style="background:var(--yellow);box-shadow:0 0 8px var(--yellow)"></span>
+          Langkah 2 — Biaya Operasional Bulanan
+        </div>
+        <div class="card-subtitle">Pengeluaran tetap per bulan, meski tidak ada yang beli</div>
+      </div>
+      <span class="help-tag" onclick="toggleTip('t2')">❓ Penjelasan</span>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tip-box" id="t2">
+      <p>
+        <strong>Biaya Operasional</strong> = pengeluaran rutin setiap bulan yang <em>tidak berubah</em>
+        meskipun produk laku banyak atau sedikit. Sering disebut "biaya overhead" atau "biaya tetap".
+      </p>
+      <p>Biaya inilah yang menentukan berapa banyak produk <em>minimum</em> harus terjual sebelum kamu
+        mulai untung (disebut <strong>BEP</strong>).</p>
+      <div class="ex">
+        📌 Kalau kamu jualan online dari rumah dan tidak ada biaya tetap, isi semua dengan 0 atau
+        kosongkan saja. Laba bersih = laba kotor.
+      </div>
+    </div>
+
+    <!-- Daftar Biaya Ops -->
+    <div class="ops-list" id="opsList">
+      <div class="ops-item">
+        <div class="ops-name" contenteditable="true">Listrik &amp; Air</div>
+        <div class="iw" style="flex:1">
+          <span class="ipfx">Rp</span>
+          <input type="number" class="ops-input" placeholder="100.000" min="0" oninput="prvOps()">
+        </div>
+        <button class="rm-btn" onclick="rmOps(this)">×</button>
+      </div>
+      <div class="ops-item">
+        <div class="ops-name" contenteditable="true">Internet</div>
+        <div class="iw" style="flex:1">
+          <span class="ipfx">Rp</span>
+          <input type="number" class="ops-input" placeholder="100.000" min="0" oninput="prvOps()">
+        </div>
+        <button class="rm-btn" onclick="rmOps(this)">×</button>
+      </div>
+      <div class="ops-item">
+        <div class="ops-name" contenteditable="true">Sewa Tempat</div>
+        <div class="iw" style="flex:1">
+          <span class="ipfx">Rp</span>
+          <input type="number" class="ops-input" placeholder="500.000" min="0" oninput="prvOps()">
+        </div>
+        <button class="rm-btn" onclick="rmOps(this)">×</button>
+      </div>
+      <div class="ops-item">
+        <div class="ops-name" contenteditable="true">Gaji / Staff</div>
+        <div class="iw" style="flex:1">
+          <span class="ipfx">Rp</span>
+          <input type="number" class="ops-input" placeholder="2.000.000" min="0" oninput="prvOps()">
+        </div>
+        <button class="rm-btn" onclick="rmOps(this)">×</button>
+      </div>
+    </div>
+
+    <button class="add-btn" onclick="addOps()">＋ Tambah Biaya Lain</button>
+    <div class="preview" id="pvOps" style="margin-top:10px">—</div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       LANGKAH 3 — DATA PENJUALAN & PERIODE
+  ══════════════════════════════════════ -->
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">
+          <span class="dot" style="background:var(--green);box-shadow:0 0 8px var(--green)"></span>
+          Langkah 3 — Data Penjualan &amp; Periode
+        </div>
+        <div class="card-subtitle">Berapa yang terjual dan ingin dihitung untuk periode mana?</div>
+      </div>
+      <span class="help-tag" onclick="toggleTip('t3')">❓ Penjelasan</span>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tip-box" id="t3">
+      <p><strong>Periode</strong> = rentang waktu yang ingin kamu evaluasi. Pilih sesuai kebutuhan:</p>
+      <div class="ex">
+        📅 <strong>1 Hari</strong> — cocok untuk cek hasil harian / flash sale<br>
+        📅 <strong>2 Hari</strong> — cocok untuk jualan 2 harian atau akhir pekan<br>
+        📅 <strong>7 Hari</strong> — laporan mingguan<br>
+        📅 <strong>30 Hari</strong> — laporan bulanan lengkap (biaya operasional penuh)<br>
+        📅 <strong>Custom</strong> — masukkan jumlah hari sendiri (misal 14, 45, 90 hari)
+      </div>
+      <p style="margin-top:8px">
+        <strong>Catatan:</strong> Biaya operasional di Langkah 2 selalu diinput per bulan (30 hari).
+        Untuk periode lebih pendek, biaya akan dihitung secara proporsional.
+      </p>
+    </div>
+
+    <!-- Pilih Periode -->
+    <div class="period-lbl">Pilih Periode Perhitungan</div>
+    <div class="period-tabs">
+      <div class="ptab" onclick="setPeriod(1)"   data-d="1">
+        <span class="pt-n">1</span><span class="pt-l">Hari</span>
+      </div>
+      <div class="ptab" onclick="setPeriod(2)"   data-d="2">
+        <span class="pt-n">2</span><span class="pt-l">Hari</span>
+      </div>
+      <div class="ptab" onclick="setPeriod(7)"   data-d="7">
+        <span class="pt-n">7</span><span class="pt-l">Hari</span>
+      </div>
+      <div class="ptab active" onclick="setPeriod(30)"  data-d="30">
+        <span class="pt-n">30</span><span class="pt-l">Hari</span>
+      </div>
+      <div class="ptab" onclick="setPeriod('c')" data-d="c">
+        <span class="pt-n">⚙</span><span class="pt-l">Custom</span>
+      </div>
+    </div>
+
+    <!-- Custom Days Input -->
+    <div class="custom-wrap" id="cwrap">
+      <div class="ig" style="margin-top:10px;margin-bottom:0">
+        <label>Jumlah Hari Custom</label>
+        <div class="iw">
+          <span class="ipfx" style="font-size:14px">📅</span>
+          <input type="number" id="custDays" placeholder="Misal: 14" min="1" max="365" class="sfx" oninput="onCustDays()">
+          <span class="isfx">hari</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="dv">
+
+    <!-- Jumlah Terjual -->
+    <div class="ig">
+      <label>
+        Jumlah Produk Terjual
+        <span id="pLbl" style="font-size:11px;color:var(--muted)">dalam 30 hari</span>
+        <span class="lb">WAJIB</span>
+      </label>
+      <div class="iw">
+        <span class="ipfx" style="font-size:14px">📦</span>
+        <input type="number" id="terjual" placeholder="Misal: 1.300" min="0" class="sfx" oninput="prvTerjual()">
+        <span class="isfx">pcs</span>
+      </div>
+      <div class="preview" id="pvTerjual">—</div>
+    </div>
+
+    <!-- Hari Kerja (hanya tampil untuk 30 hari / custom) -->
+    <div class="ig" id="hariGroup">
+      <label>
+        Hari Kerja / Buka Bulan Ini
+        <span style="font-size:11px;color:var(--muted)">(dari 30 hari, berapa hari aktif jualan?)</span>
+      </label>
+      <div class="iw">
+        <span class="ipfx" style="font-size:14px">🗓️</span>
+        <input type="number" id="hariOps" placeholder="26" min="1" max="31" class="sfx" value="26">
+        <span class="isfx">hari</span>
+      </div>
+      <div class="preview">Dipakai untuk menghitung BEP per hari. Biasanya 25–26 hari.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TOMBOL HITUNG
+  ══════════════════════════════════════ -->
+  <button class="calc-btn" onclick="hitung()">⚡ Hitung Untung / Rugi Sekarang</button>
+
+  <!-- ══════════════════════════════════════
+       HASIL / RESULT CARD
+  ══════════════════════════════════════ -->
+  <div class="result-card" id="resultCard">
+
+    <!-- Status Header -->
+    <div class="res-top">
+      <div class="res-status">
+        <span class="res-icon" id="resIcon"></span>
+        <span class="res-lbl"  id="resLbl"></span>
+      </div>
+      <span class="period-badge" id="resPBadge"></span>
+    </div>
+
+    <!-- Angka Utama -->
+    <div class="big-num">
+      <div class="bn-lbl" id="bnLbl">Laba / Rugi Bersih</div>
+      <div class="bn-val" id="bnVal">—</div>
+      <div class="bn-sub" id="bnSub"></div>
+    </div>
+
+    <!-- Grid Kartu Info -->
+    <div class="res-grid">
+      <div class="ri">
+        <div class="ri-lbl">Margin / pcs</div>
+        <div class="ri-val bl" id="rMargin">—</div>
+        <div class="ri-note">Untung tiap satu produk terjual</div>
+      </div>
+      <div class="ri">
+        <div class="ri-lbl">Margin %</div>
+        <div class="ri-val bl" id="rMarginPct">—</div>
+        <div class="ri-note">Persen keuntungan dari modal</div>
+      </div>
+      <div class="ri">
+        <div class="ri-lbl">Total Omzet</div>
+        <div class="ri-val" id="rOmzet">—</div>
+        <div class="ri-note">Uang masuk dari semua penjualan</div>
+      </div>
+      <div class="ri">
+        <div class="ri-lbl">Laba Kotor</div>
+        <div class="ri-val gr" id="rLabaKotor">—</div>
+        <div class="ri-note">Omzet dikurangi semua modal</div>
+      </div>
+    </div>
+
+    <!-- BEP -->
+    <div class="bep-row">
+      <div class="bep-l">
+        <div class="bep-title">⚖️ BEP — Titik Impas (Break Even Point)</div>
+        <div class="bep-desc">
+          Minimal <strong id="bepH">—</strong> pcs/hari agar tidak rugi<br>
+          atau <strong id="bepB">—</strong> pcs/bulan (biaya ops = Rp <span id="bepOps">—</span>)
+        </div>
+      </div>
+      <div class="bep-r">
+        <div class="bv" id="rBEP">—</div>
+        <div class="bs">pcs / hari</div>
+      </div>
+    </div>
+
+    <!-- Section Divider -->
+    <div class="sec-div"><span>Ringkasan Per Periode</span></div>
+
+    <!-- View Tabs -->
+    <div class="view-tabs">
+      <div class="vtab" onclick="switchView('h')"><span>Harian</span></div>
+      <div class="vtab" onclick="switchView('2h')"><span>2 Hari</span></div>
+      <div class="vtab" onclick="switchView('m')"><span>Minggu</span></div>
+      <div class="vtab active" onclick="switchView('b')"><span>Bulanan</span></div>
+      <div class="vtab" onclick="switchView('i')"><span>Inputan</span></div>
+    </div>
+    <div class="preview" id="viewNote" style="margin-bottom:10px">
+      Tabel berdasarkan estimasi rata-rata harian × periode
+    </div>
+
+    <!-- Tabel Ringkasan -->
+    <table class="stbl">
+      <tbody id="stblBody"></tbody>
+    </table>
+
+    <hr class="dv">
+
+    <!-- Progress Bar vs BEP -->
+    <div class="prog-head">
+      <span class="ph-l">Pencapaian vs BEP</span>
+      <span class="ph-r" id="progPct">—</span>
+    </div>
+    <div class="prog-track">
+      <div class="prog-bar"   id="progBar"    style="width:0%"></div>
+      <div class="bep-marker" id="bepMark"    style="left:60%"></div>
+    </div>
+    <div class="prog-labels">
+      <span>0 pcs</span>
+      <span id="progBepLbl">▲ BEP</span>
+      <span id="progMax">—</span>
+    </div>
+
+    <!-- Kotak Saran -->
+    <div class="advice-box" id="advBox">
+      <div class="adv-title" id="advTitle"></div>
+      <div class="adv-text"  id="advText"></div>
+    </div>
+
+  </div><!-- /result-card -->
+
+  <!-- ══════════════════════════════════════
+       KAMUS ISTILAH BISNIS
+  ══════════════════════════════════════ -->
+  <div class="glos">
+    <div class="glos-head" onclick="toggleGlos()">
+      <h3>📚 Kamus Istilah Bisnis untuk Pemula</h3>
+      <span class="glos-arrow" id="glosArr">▼</span>
+    </div>
+    <div class="glos-body" id="glosBody">
+
+      <div class="gi">
+        <div class="gi-term">HPP — Harga Pokok Produksi / Pembelian</div>
+        <div class="gi-def">Total biaya yang dikeluarkan untuk membuat atau membeli <em>satu</em> unit
+          produk. Ini adalah "modal dasar" per produk sebelum kamu bisa mulai untung.</div>
+        <div class="gi-ex">Contoh: bahan baku Rp 2.000 + kemasan Rp 500 + ongkos produksi Rp 200 = HPP Rp 2.700 per pcs</div>
+      </div>
+
+      <div class="gi">
+        <div class="gi-term">Margin / Keuntungan Kotor per pcs</div>
+        <div class="gi-def">Selisih antara harga jual dan HPP. Ini keuntungan yang kamu dapat dari setiap
+          produk terjual, <em>sebelum</em> dikurangi biaya operasional bulanan.</div>
+        <div class="gi-ex">Contoh: Harga jual Rp 5.000 − HPP Rp 2.700 = Margin Rp 2.300 per pcs</div>
+      </div>
+
+      <div class="gi">
+        <div class="gi-term">Biaya Operasional (Biaya Tetap / Overhead)</div>
+        <div class="gi-def">Pengeluaran rutin per bulan yang harus dibayar <em>terlepas</em> dari berapa
+          produk yang terjual. Kalau kamu tidak jualan sekalipun, biaya ini tetap ada.</div>
+        <div class="gi-ex">Contoh: sewa toko Rp 500.000, listrik Rp 100.000, gaji karyawan Rp 2.000.000 → total Rp 2.600.000/bulan</div>
+      </div>
+
+      <div class="gi">
+        <div class="gi-term">Omzet (Pendapatan Kotor)</div>
+        <div class="gi-def">Total <em>uang masuk</em> dari semua penjualan. Ini BUKAN keuntungan — belum
+          dikurangi modal maupun biaya apapun. Omzet besar belum tentu untung besar!</div>
+        <div class="gi-ex">Contoh: 100 pcs × Rp 5.000 = Omzet Rp 500.000. Tapi modal 100 pcs = Rp 270.000, jadi untung kotornya Rp 230.000.</div>
+      </div>
+
+      <div class="gi">
+        <div class="gi-term">Laba Kotor</div>
+        <div class="gi-def">Omzet dikurangi total HPP (modal semua produk yang terjual).
+          Ini keuntungan <em>sebelum</em> dikurangi biaya operasional.</div>
+        <div class="gi-ex">Laba Kotor = Total Omzet − Total HPP</div>
+      </div>
+
+      <div class="gi">
+        <div class="gi-term">Laba Bersih (Keuntungan Sesungguhnya)</div>
+        <div class="gi-def">Keuntungan <em>setelah semua biaya</em> dikurangi. Inilah uang yang
+          benar-benar "masuk kantong" atau bisa kamu simpan / reinvestasikan.</div>
+        <div class="gi-ex">Laba Bersih = Laba Kotor − Biaya Operasional</div>
+      </div>
+
+      <div class="gi">
+        <div class="gi-term">BEP — Break Even Point (Titik Impas)</div>
+        <div class="gi-def">Jumlah produk <em>minimum</em> yang harus terjual agar kamu tidak untung dan
+          tidak rugi. Jual <em>di bawah</em> BEP = rugi. Jual <em>di atas</em> BEP = mulai untung.</div>
+        <div class="gi-ex">
+          Rumus: BEP = Total Biaya Ops ÷ Margin per pcs<br>
+          Contoh: Rp 2.700.000 ÷ Rp 2.300 ≈ 1.174 pcs/bulan = ~45 pcs/hari (26 hari kerja)
+        </div>
+      </div>
+
+    </div><!-- /glos-body -->
+  </div><!-- /glos -->
+
+  <!-- ══════════════════════════════════════
+       TOMBOL RESET
+  ══════════════════════════════════════ -->
+  <button class="reset-btn" onclick="doReset()">↺ Reset Semua Data</button>
+
+</div><!-- /wrap -->
+
+<!-- JavaScript -->
+<script src="script.js"></script>
+</body>
+</html>
